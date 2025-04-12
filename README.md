@@ -28,7 +28,7 @@ index.php
 Clone the project
 
 ```bash
-git clone (https://github.com/Pranay-Prasad2/healthy_habitat.git)
+git clone https://github.com/Pranay-Prasad2/healthy_habitat.git
 ```
 
 
