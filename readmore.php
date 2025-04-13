@@ -30,7 +30,7 @@ $products = mysqli_query($conn, $all_products);
             <div class="row">
                 <!-- Product Image and Title -->
                 <div class="col-md-4">
-                    <img src="./assets/product.jpg" alt="Product Image" class="img-fluid rounded shadow-sm mb-3">
+                    <img src="./assets/products.jpg" alt="Product Image" class="img-fluid rounded shadow-sm mb-3">
                 </div>
                 <div class="col-md-8">
                     <h3 class="card-title"><?php echo htmlspecialchars($row['product_name']); ?></h3>

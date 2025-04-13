@@ -65,7 +65,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         }
     } else {
         // Invalid login: display an error message
-        $message = "Invalid credentials. Please try again.";
+        $_SESSION['message'] = "Invalid credentials. Please try again.";
         header("Location: " . $_SERVER['PHP_SELF']);
         exit();
     }

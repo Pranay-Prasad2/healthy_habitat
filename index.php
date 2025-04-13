@@ -45,25 +45,18 @@ if (!$products) {
 
 <!-- Video Section -->
 <div class="mt-5" style="max-width: 1800px; margin:auto;">
-    <div class="d-flex justify-content-between align-items-center gap-2 w-100 px-5">
-        <div class="video-container border border-primary" style="position: relative; width: 70%; height: 60vh; overflow: hidden;">
-            <!-- Embed YouTube Video with highest quality settings -->
-            <iframe width="100%" height="100%"
-                src="https://www.youtube.com/embed/wEyiqO9qg2s?autoplay=1&mute=1&vq=hd720"
-                title="YouTube video player"
-                frameborder="0"
-                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
-                allowfullscreen>
-            </iframe>
-        </div>
-        <div class="d-flex flex-column justify-content-center align-items-center px-4" style="width: 28%;">
-            <h4 class="text-center">Healthy products/services on HealthyHabitat</h4>
-            <p class="text-center">
-                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque rerum asperiores, deleniti architecto aspernatur sit omnis nobis reiciendis a molestias, quo sequi natus itaque quis!
-            </p>
-            <a href="./product.php" class="btn btn-primary">Explore Products</a>
-        </div>
+<div class="d-flex justify-content-between align-items-center gap-2 w-100 px-5 flex-wrap">
+    <div class="banner" style="height: 500px; width: 65%;">
+        <img src="./assets/banner.png" alt="websitebanner" style="height: 100%; width: 100%; object-fit: cover; border-radius: 8px;">
     </div>
+    <div class="d-flex flex-column justify-content-center align-items-center px-4" style="width: 30%;">
+        <h4 class="text-center">Healthy products/services on HealthyHabitat</h4>
+        <p class="text-center">
+            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque rerum asperiores, deleniti architecto aspernatur sit omnis nobis reiciendis a molestias, quo sequi natus itaque quis!
+        </p>
+        <a href="./product.php" class="btn btn-primary">Explore Products</a>
+    </div>
+</div>
 
 
     <!-- Most Liked Products Section -->

@@ -57,37 +57,44 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 ?>
 <div class="d-flex flex-column justify-content-center align-items-center mt-3 gap-3">
     <h1 class="h1">Register your Business</h1>
-    <div class="w-25 card shadow p-4">
-        <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
-            <div class="mb-3">
-                <label for="email" class="form-label">Email address</label>
-                <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" value="<?php echo isset($userEMAIL) ? $userEMAIL : ''; ?>">
-            </div>
-            <div class="mb-3">
-                <label for="name" class="form-label">Business Name</label>
-                <input type="text" class="form-control" id="name" name="name" value="<?php echo isset($username) ? $username : ''; ?>">
-            </div>
-            <div class="mb-3">
-                <label for="desc" class="form-label">Business description</label>
-                <textarea name="desc" id="desc" class="form-control"><?php echo isset($description) ? $description : ''; ?></textarea>
-            </div>
-            <div class="mb-3">
-                <label for="upassword" class="form-label">Password</label>
-                <input type="password" class="form-control" name="upassword" id="upassword">
-            </div>
-            <div class="mb-3">
-                <label for="area" class="form-label">Select Your area</label>
-                <select name="area_id" id="area_id" class="form-control">
-                    <option value="">Select area</option>
-                    <?php
-                    while ($area_row = mysqli_fetch_assoc($area_list)) {
-                        echo "<option value='" . $area_row['area_id'] . "'>" . $area_row['area_name'] . "</option>";
-                    }
-                    ?>
-                </select>
-            </div>
-            <input type="submit" class="btn btn-primary" />
-        </form>
+    <div class="d-flex w-100 gap-5 justify-content-center align-items-center">
+        <div style="height: 600px; width:40%">
+            <img src="../assets/register.jpg" alt="Register" height="100%" width="100%" style="object-fit: cover;">
+        </div>
+        <div class="card shadow p-4" style="width: 35%;">
+            <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
+                <div class="mb-3">
+                    <label for="email" class="form-label">Email address*</label>
+                    <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" value="<?php echo isset($userEMAIL) ? $userEMAIL : ''; ?>">
+                </div>
+                <div class="mb-3">
+                    <label for="name" class="form-label">Business Name*</label>
+                    <input type="text" class="form-control" id="name" name="name" value="<?php echo isset($username) ? $username : ''; ?>">
+                </div>
+                <div class="mb-3">
+                    <label for="desc" class="form-label">Business description*</label>
+                    <textarea name="desc" id="desc" class="form-control"><?php echo isset($description) ? $description : ''; ?></textarea>
+                </div>
+                <div class="mb-3">
+                    <label for="upassword" class="form-label">Password*</label>
+                    <input type="password" class="form-control" name="upassword" id="upassword">
+                </div>
+                <div class="mb-3">
+                    <label for="area" class="form-label">Select Your area*</label>
+                    <select name="area_id" id="area_id" class="form-control">
+                        <option value="">Select area</option>
+                        <?php
+                        while ($area_row = mysqli_fetch_assoc($area_list)) {
+                            echo "<option value='" . $area_row['area_id'] . "'>" . $area_row['area_name'] . "</option>";
+                        }
+                        ?>
+                    </select>
+                </div>
+                <div class="d-flex justify-content-center">
+                    <input type="submit" class="btn btn-primary w-50 p-2" />
+                </div>
+            </form>
+        </div>
     </div>
     <?php echo '<a href="/healthy_habitat/login.php" class="btn btn-secondary"> << Back to Login</a>'; ?>
 </div>

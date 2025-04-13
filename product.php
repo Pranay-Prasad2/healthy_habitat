@@ -2,8 +2,10 @@
 session_start();
 include('db.php');
 include('navbar.php');
+
 $user_id = isset($_SESSION['user_id']) ? $_SESSION['user_id'] : null;
 $role = isset($_SESSION['role']) ? $_SESSION['role'] : '';
+
 $query = isset($_SESSION['user_id']) ?
     "SELECT 
         p.product_id, 
@@ -37,30 +39,42 @@ $query = isset($_SESSION['user_id']) ?
      JOIN business b ON p.business_id = b.business_id
      JOIN area a ON b.area_id = a.area_id";
 
-
 $result = mysqli_query($conn, $query);
-
 $products = [];
 while ($row = mysqli_fetch_assoc($result)) {
     $products[] = $row;
 }
+
+// ✅ Dynamic price range calculation
+$prices = array_column($products, 'product_price');
+$minPrice = min($prices);
+$maxPrice = max($prices);
+$range = $maxPrice - $minPrice;
+
+$affordableLimit = $minPrice + ($range / 3);
+$moderateLimit = $minPrice + 2 * ($range / 3);
 ?>
 
 <button id="backToTop" class="btn btn-primary position-fixed p-2 px-4" style="bottom: 40px; right: 40px; display: none; z-index: 1000;">
     ↑ Back to Top
 </button>
-<div style="margin:auto; max-width: 1800px; ">
 
+<div style="margin:auto; max-width: 1800px;">
     <div class="m-auto d-flex flex-column justify-content-center align-items-center p-5" style="width: 95%;">
         <nav class="card d-flex flex-row justify-content-center align-items-center w-100 gap-3 p-3 position-relative shadow p-4">
             <input type="text" id="searchBar" class="form-control w-25" placeholder="Search product...">
             <ul id="suggestions" class="list-group position-absolute" style="z-index: 999; top: 60px; left: 0; width: 25%; display: none;"></ul>
 
+            <select id="typeFilter" class="form-control w-25">
+                <option value="">All Types</option>
+                <option value="product">Product</option>
+                <option value="service">Service</option>
+            </select>
             <select id="priceFilter" class="form-control w-25">
                 <option value="">All Prices</option>
-                <option value="Affordable">Affordable</option>
-                <option value="Moderate">Moderate</option>
-                <option value="Premium">Premium</option>
+                <option value="Affordable">Affordable (≤ £<?php echo number_format($affordableLimit); ?>)</option>
+                <option value="Moderate">Moderate (£<?php echo number_format($affordableLimit + 1); ?> - £<?php echo number_format($moderateLimit); ?>)</option>
+                <option value="Premium">Premium (≥ £<?php echo number_format($moderateLimit + 1); ?>)</option>
             </select>
 
             <select id="areaFilter" class="form-control w-25">
@@ -89,17 +103,13 @@ while ($row = mysqli_fetch_assoc($result)) {
         </div>
     </div>
 </div>
+
 <script>
-    //Back to top BTN
+    // Back to top BTN
     const backToTopBtn = document.getElementById("backToTop");
     window.addEventListener("scroll", () => {
-        if (window.scrollY > 300) {
-            backToTopBtn.style.display = "block";
-        } else {
-            backToTopBtn.style.display = "none";
-        }
+        backToTopBtn.style.display = window.scrollY > 300 ? "block" : "none";
     });
-
     backToTopBtn.addEventListener("click", () => {
         window.scrollTo({
             top: 0,
@@ -111,11 +121,18 @@ while ($row = mysqli_fetch_assoc($result)) {
     const userId = <?php echo $user_id ? $user_id : 0; ?>;
     const userRole = "<?php echo $role; ?>";
 
+    // ✅ Dynamic price limits from PHP
+    const priceLimits = {
+        affordable: <?php echo $affordableLimit; ?>,
+        moderate: <?php echo $moderateLimit; ?>
+    };
+
     const productContainer = document.getElementById("productContainer");
     const priceFilter = document.getElementById("priceFilter");
     const areaFilter = document.getElementById("areaFilter");
     const businessFilter = document.getElementById("businessFilter");
     const searchInput = document.getElementById("searchBar");
+    const typeFilter = document.getElementById("typeFilter");
     const suggestionsBox = document.getElementById("suggestions");
 
     function renderProducts(data) {
@@ -133,35 +150,37 @@ while ($row = mysqli_fetch_assoc($result)) {
             card.innerHTML = `
               <span class="position-absolute text-capitalize p-2 px-5 fs-6 badge bg-danger" style="top: 22px; right: -40px;">
                  ${product.product_type}
-            </span>
-            <img class="card-img-top" src="./assets/product.jpg" alt="Product image">
-            <div class="card-body">
-                <h5 class="card-title">${product.product_name}</h5>
-                <p class="card-text">${product.product_desc}</p>
-                <p class="card-text"><strong>Area:</strong> ${product.area_name}</p>
-                <p class="card-text"><strong>Business:</strong> ${product.business_name}</p>
-                <p class="card-text"><strong>Price:</strong> ${product.product_price}</p>
-                <p class="card-text"><strong>Votes:</strong> ${product.product_likes}</p>
-                <div class="d-flex justify-content-between align-items.center ">
-                <a class="btn btn-primary w-50" href="/healthy_habitat/readmore.php?product_id=${product.product_id}">Read More</a>
+              </span>
+              <img class="card-img-top" src="./assets/products.jpg" alt="Product image">
+              <div class="card-body d-flex flex-column justify-content-between">
+                    <div class="product-details mb-3">
+                        <h5 class="card-title">${product.product_name}</h5>
+                        <p class="card-text">${product.product_desc}</p>
+                        <p class="card-text"><strong>Area:</strong> ${product.area_name}</p>
+                        <p class="card-text"><strong>Business:</strong> ${product.business_name}</p>
+                        <p class="card-text"><strong>Price:</strong> ${product.product_price}</p>
+                        <p class="card-text"><strong>Votes:</strong> ${product.product_likes}</p>
+                    </div>
 
+                    <div class="product-actions d-flex justify-content-between align-items-center mt-auto">
+                        <a class="btn btn-primary w-50" href="/healthy_habitat/readmore.php?product_id=${product.product_id}">Read More</a>
 
-                ${ userId != 0 ? (
-                    liked ? `
-                    <a href='/healthy_habitat/dislike.php?product_id=${product.product_id}'>
-                        <img class='like-img' src='./assets/vote-yes.svg' width='30px' height='30px'>
-                    </a>` :  `
-                    <a href='/healthy_habitat/like.php?product_id=${product.product_id}'>
-                        <img class='like-img' src='./assets/vote-no.svg' width='30px' height='30px'>
-                    </a>`): ''
-                }
+                        ${ userId != 0 ? (
+                            liked ? `
+                            <a href='/healthy_habitat/dislike.php?product_id=${product.product_id}'>
+                                <img class='like-img' src='./assets/heart-like.png' alt="like/dislike" width='30px' height='30px'>
+                            </a>` :  `
+                            <a href='/healthy_habitat/like.php?product_id=${product.product_id}'>
+                                <img class='like-img' src='./assets/heart-normal.png' alt="like/dislike" width='30px' height='30px'>
+                            </a>`): ''
+                        }
 
-                ${ userRole != 'business' && userRole != 'admin' && userRole != 'user' && userId == 0?                        
-                        `<a href='/healthy_habitat/login.php'>
-                        <img class='like-img' src='./assets/vote-no.svg' width='30px' height='30px'>
-                    </a>`:'' }
-               </div>     
-            </div>`;
+                        ${ userRole != 'business' && userRole != 'admin' && userRole != 'user' && userId == 0?                        
+                                `<a href='/healthy_habitat/login.php'>
+                                <img class='like-img' src='./assets/heart-normal.png' alt="like/dislike" width='30px' height='30px'>
+                            </a>`:'' }
+                    </div>  
+                </div>`;
             productContainer.appendChild(card);
         });
     }
@@ -175,65 +194,63 @@ while ($row = mysqli_fetch_assoc($result)) {
         let filtered = products.filter(p =>
             (!areaVal || p.area_name === areaVal) &&
             (!bizVal || p.business_name === bizVal) &&
+            (!typeFilter.value || p.product_type.toLowerCase() === typeFilter.value) &&
             (!searchVal || p.product_name.toLowerCase().includes(searchVal))
         );
 
+        // ✅ Dynamic price filter logic
         if (priceVal) {
             filtered = filtered.filter(p => {
-                // Here we need to handle the price ranges.
+                const price = parseFloat(p.product_price);
                 switch (priceVal) {
                     case 'Affordable':
-                        return p.product_price <= 50; // Change as per your price range
+                        return price <= priceLimits.affordable;
                     case 'Moderate':
-                        return p.product_price > 50 && p.product_price <= 150; // Adjust as needed
+                        return price > priceLimits.affordable && price <= priceLimits.moderate;
                     case 'Premium':
-                        return p.product_price > 150; // Adjust as needed
+                        return price > priceLimits.moderate;
                     default:
                         return true;
                 }
             });
         }
+
         renderProducts(filtered);
+    }
 
-        // Search suggestions
-        searchInput.addEventListener("input", () => {
-            const query = searchInput.value.trim().toLowerCase();
-            if (query.length === 0) {
-                suggestionsBox.style.display = "none";
-                applyFilters();
-                return;
-            }
+    searchInput.addEventListener("input", () => {
+        const query = searchInput.value.trim().toLowerCase();
+        if (query.length === 0) {
+            suggestionsBox.style.display = "none";
+            applyFilters();
+            return;
+        }
 
-            const suggestions = products
-                .filter(p => p.product_name.toLowerCase().includes(query))
-                .map(p => p.product_name)
-                .filter((name, i, arr) => arr.indexOf(name) === i)
-                .slice(0, 5);
+        const suggestions = products
+            .filter(p => p.product_name.toLowerCase().includes(query))
+            .map(p => p.product_name)
+            .filter((name, i, arr) => arr.indexOf(name) === i)
+            .slice(0, 5);
 
-            suggestionsBox.innerHTML = suggestions.map(s => `<li class="list-group-item suggestion-item">${s}</li>`).join("");
-            suggestionsBox.style.display = suggestions.length > 0 ? "block" : "none";
-        });
+        suggestionsBox.innerHTML = suggestions.map(s => `<li class="list-group-item suggestion-item">${s}</li>`).join("");
+        suggestionsBox.style.display = suggestions.length > 0 ? "block" : "none";
+    });
 
-        suggestionsBox.addEventListener("click", (e) => {
-            if (e.target.classList.contains("suggestion-item")) {
-                const selected = e.target.textContent;
-                searchInput.value = selected;
-                suggestionsBox.style.display = "none";
-                filterBySearch(selected);
-            }
-        });
-
-        function filterBySearch(term) {
-            const exact = products.filter(p => p.product_name.toLowerCase() === term.toLowerCase());
+    suggestionsBox.addEventListener("click", (e) => {
+        if (e.target.classList.contains("suggestion-item")) {
+            const selected = e.target.textContent;
+            searchInput.value = selected;
+            suggestionsBox.style.display = "none";
+            const exact = products.filter(p => p.product_name.toLowerCase() === selected.toLowerCase());
             renderProducts(exact);
         }
-    }
+    });
 
     priceFilter.addEventListener("change", applyFilters);
     areaFilter.addEventListener("change", applyFilters);
     businessFilter.addEventListener("change", applyFilters);
     searchInput.addEventListener("input", applyFilters);
-
+    typeFilter.addEventListener("change", applyFilters);
     renderProducts(products);
 </script>
 
@@ -245,6 +262,20 @@ while ($row = mysqli_fetch_assoc($result)) {
         width: 100%;
     }
 
+    .card-body {
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+    }
+
+    .product-details {
+        flex-grow: 1;
+    }
+
+    .product-actions {
+        margin-top: auto;
+    }
+
     .suggestion-item:hover {
         background-color: #f0f0f0;
         cursor: pointer;
@@ -253,12 +284,10 @@ while ($row = mysqli_fetch_assoc($result)) {
     .like-img {
         cursor: pointer;
     }
-    .badge{
-        /* color: black; */
+
+    .badge {
         transform: rotate(45deg);
     }
 </style>
 
-<?php
-include("./footer.php")
-?>
+<?php include("./footer.php") ?>

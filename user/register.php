@@ -58,18 +58,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <div class="d-flex flex-column justify-content-center align-items-center mt-3 gap-3">
     <h1>Register as Resident</h1>
-    <div class="w-25 card shadow p-4 ">
+    <div class="d-flex w-100 gap-5 justify-content-center align-items-center">
+        <div style="height: 600px; width:40%">
+            <img src="../assets/register.jpg" alt="Register" height="100%" width="100%" style="object-fit: cover;">
+        </div>
+    <div class="card shadow p-4 " style="width: 40%;">
         <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]) ?>" method="post">
             <div class="mb-3">
-                <label for="email" class="form-label">Email address</label>
+                <label for="email" class="form-label">Email address*</label>
                 <input type="email" class="form-control" id="email" name="email" aria-describedby="emailHelp" required>
             </div>
             <div class="mb-3">
-                <label for="name" class="form-label">Full Name</label>
+                <label for="name" class="form-label">Full Name*</label>
                 <input type="text" class="form-control" id="name" name="name" aria-describedby="name" required>
             </div>
             <div class="mb-3">
-                <label for="upassword" class="form-label">Password</label>
+                <label for="upassword" class="form-label">Password*</label>
                 <input type="password" class="form-control" name="upassword" id="upassword" required>
             </div>
             <div class="mb-3">
@@ -85,7 +89,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 </select>
             </div>
             <div class="mb-3">
-                <label for="area" class="form-label">Select Your area</label>
+                <label for="area" class="form-label">Select Your area*</label>
                 <select name="area_id" id="area_id" class="form-control" required>
                     <option value="">Select area</option>
                     <?php
@@ -99,8 +103,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                 <label for="interest" class="form-label">Interest</label>
                 <textarea name="interest" id="interest" class="form-control"></textarea>
             </div>
-            <input type="submit" class="btn btn-primary" />
+            <div class="d-flex justify-content-center">
+                <input type="submit" class="btn btn-primary w-50 p-2" />
+            </div>
         </form>
+    </div>
     </div>
     <?php echo '<a href="/healthy_habitat/login.php" class="btn btn-secondary " > << Back to Login</a>'; ?>
 </div>
