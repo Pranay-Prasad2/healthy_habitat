@@ -45,31 +45,37 @@ if (!$products) {
 
 <!-- Video Section -->
 <div class="mt-5" style="max-width: 1800px; margin:auto;">
-<div class="d-flex justify-content-between align-items-center gap-2 w-100 px-5 flex-wrap">
-    <div class="banner" style="height: 500px; width: 65%;">
-        <img src="./assets/banner.png" alt="websitebanner" style="height: 100%; width: 100%; object-fit: cover; border-radius: 8px;">
+    <div class="d-flex justify-content-between align-items-center gap-2 w-100 px-5 flex-wrap">
+        <div class="banner" style="height: 500px; width: 65%;">
+            <img src="./assets/banner.png" alt="websitebanner" style="height: 100%; width: 100%; object-fit: cover; border-radius: 8px;">
+        </div>
+        <div class="d-flex flex-column justify-content-center align-items-center px-4" style="width: 30%;">
+            <h4 class="text-center">Healthy products/services on HealthyHabitat</h4>
+            <p class="text-center">
+                Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque rerum asperiores, deleniti architecto aspernatur sit omnis nobis reiciendis a molestias, quo sequi natus itaque quis!
+            </p>
+            <a href="./product.php" class="btn btn-primary">Explore Products</a>
+        </div>
     </div>
-    <div class="d-flex flex-column justify-content-center align-items-center px-4" style="width: 30%;">
-        <h4 class="text-center">Healthy products/services on HealthyHabitat</h4>
-        <p class="text-center">
-            Lorem ipsum dolor sit, amet consectetur adipisicing elit. Eaque rerum asperiores, deleniti architecto aspernatur sit omnis nobis reiciendis a molestias, quo sequi natus itaque quis!
-        </p>
-        <a href="./product.php" class="btn btn-primary">Explore Products</a>
-    </div>
-</div>
 
 
     <!-- Most Liked Products Section -->
     <div class="mt-5 w-100 px-5">
-        <h2 class="text-center">Our Most Liked Products</h2>
+        <h2 class="text-center">Our Most Liked Products / Services</h2>
         <div class="d-grid gap-5 mt-4 w-100" style="grid-template-columns: repeat(4, 1fr);">
             <?php while ($product_row = mysqli_fetch_assoc($products)) { ?>
-                <div class="card" style="width: 100%;">
-                    <img class="card-img-top" src="./assets/product.jpg" alt="Card image cap">
+                <div class="card" style="width: 100%; overflow:hidden">
+                    <span class="position-absolute text-capitalize p-2 px-5 fs-6 badge bg-danger" style="top: 22px; right: -40px;">
+                    <?php echo $product_row['product_type']; ?>
+                    </span>
+                    <img class="card-img-top" src="./assets/products.jpg" alt="Card image cap" style="max-height: 300px;">
                     <div class="card-body">
                         <h5 class="card-title"><?php echo $product_row['product_name']; ?></h5>
                         <p class="card-text"><?php echo $product_row['product_desc']; ?></p>
-                        <a href="#" class="btn btn-primary">View Product</a>
+                        <p class="card-text"><strong>Business: </strong><?php echo $product_row['business_name']; ?></p>
+                        <p class="card-text"><strong>Votes: </strong> <?php echo $product_row['product_likes']; ?></p>
+                        <p class="card-text"><strong>Area: </strong> <?php echo $product_row['area_name']; ?></p>
+                        <a href="/healthy_habitat/readmore.php?product_id= <?php echo $product_row['product_id']; ?>" class="btn btn-primary">View Product</a>
                     </div>
                 </div>
             <?php } ?>
@@ -102,5 +108,11 @@ if (!$products) {
         }
     }
 </script>
+
+<style>
+    .badge {
+        transform: rotate(45deg);
+    }
+</style>
 
 <?php include('footer.php'); ?>
