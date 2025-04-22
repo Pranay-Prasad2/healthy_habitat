@@ -18,7 +18,7 @@ $user_name = isset($_SESSION['user']) ? $_SESSION['user'] : "";
                     <a class="nav-link" aria-current="page" href="/healthy_habitat/index.php">Home</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" aria-current="page" href="/healthy_habitat/product.php">Products</a>
+                    <a class="nav-link" aria-current="page" href="/healthy_habitat/product.php">Products & Services</a>
                 </li>
                 <?php
                 if (isset($_SESSION['role']) && $_SESSION['role'] == 'business') {

@@ -1,7 +1,9 @@
 <?php
 include("../navbar.php");
 include("../db.php");
-
+if (!isset($_SESSION['role']) || $_SESSION['role'] != 'business') {
+    header("Location: /healthy_habitat/index.php");
+}
 if (isset($_SESSION['message'])) {
     echo '
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -43,13 +45,14 @@ if (!$result) {
 
 <div class="d-flex justify-content-center align-items-start mt-3" style="min-height: 60vh;">
     <div class="w-75 card shadow p-4">
-        <?php echo '<a href="/healthy_habitat/crud/add-products.php" class="btn btn-secondary w-25" > Add product</a>'; ?>
+        <?php echo '<a href="/healthy_habitat/crud/add-products.php" class="btn btn-secondary w-25" > Add Product / Service</a>'; ?>
         <table class="table">
             <thead>
                 <tr>
                     <th scope="col">Id</th>
                     <th scope="col">Name</th>
                     <th scope="col">Description</th>
+                    <th scope="col">Offering Type</th>
                     <th scope="col">Price</th>
                     <th scope="col">Actions</th>
                 </tr>
@@ -60,6 +63,7 @@ if (!$result) {
                         <th scope="row"><?php echo htmlspecialchars($product_row['product_id']); ?></th>
                         <td><?php echo htmlspecialchars($product_row["product_name"]); ?></td>
                         <td><?php echo htmlspecialchars($product_row["product_desc"]); ?></td>
+                        <td><?php echo htmlspecialchars($product_row["product_type"]); ?></td>
                         <td><?php echo htmlspecialchars($product_row["product_price"]); ?></td>
                         <td>
                             <a class="btn btn-primary" href="/healthy_habitat/crud/update-product.php?product_id=<?php echo $product_row['product_id']; ?>"> Update</a>

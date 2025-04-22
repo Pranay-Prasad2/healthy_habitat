@@ -108,7 +108,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 
     <div class="mt-3 w-25 d-flex justify-content-between gap-2">
-        <?php echo '<a href="/healthy_habitat/user/register.php" class="btn btn-secondary w-50">Register As User</a>'; ?>
+        <?php echo '<a href="/healthy_habitat/user/register.php" class="btn btn-secondary w-50">Register As Resident</a>'; ?>
         <?php echo '<a href="/healthy_habitat/business/business-register.php" class="btn btn-primary w-50">Register As Business</a>'; ?>
     </div>
 </div>

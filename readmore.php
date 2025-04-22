@@ -38,7 +38,7 @@ $products = mysqli_query($conn, $all_products);
                     <p><strong>Type: </strong><?php echo htmlspecialchars($row['product_type']); ?></p>
                     <p><strong>Price: </strong>$<?php echo number_format($row['product_price'], 2); ?></p>
                     <p><strong>Quantity Available: </strong><?php echo htmlspecialchars($row['quantity']); ?></p>
-                    <p><strong>Likes: </strong><?php echo htmlspecialchars($row['product_likes']); ?></p>
+                    <p><strong>Votes: </strong><?php echo htmlspecialchars($row['product_likes']); ?></p>
                 </div>
             </div>
             

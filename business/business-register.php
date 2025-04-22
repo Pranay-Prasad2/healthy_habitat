@@ -1,5 +1,4 @@
 <?php
-// session_start();
 include("../db.php");
 include("../navbar.php");
 
@@ -17,14 +16,12 @@ if (isset($_SESSION['message'])) {
         </div>
     </div>';
 
-    // Clear the message after displaying it
     unset($_SESSION['message']);
 }
 
 $fetch_area_query = "SELECT * FROM area";
 $area_list = mysqli_query($conn, $fetch_area_query);
 
-// Check for form submission
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = filter_input(INPUT_POST, "name", FILTER_SANITIZE_SPECIAL_CHARS);
     $description = filter_input(INPUT_POST, "desc", FILTER_SANITIZE_SPECIAL_CHARS);
@@ -32,29 +29,40 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userpassword = filter_input(INPUT_POST, "upassword", FILTER_SANITIZE_SPECIAL_CHARS);
     $areaId = $_POST["area_id"];
 
-    // Check for empty fields
     if (empty($username) || empty($description) || empty($userEMAIL) || empty($userpassword) || empty($areaId)) {
         $_SESSION['message'] = 'All fields are required. Please fill in all the details.';
     } else {
-        // Proceed with inserting the data if all fields are filled
-        $register_user_query = "INSERT INTO business(business_name, business_description, business_email, business_password, area_id) VALUES (?, ?, ?, ?, ?)";
-        $stmt = mysqli_prepare($conn, $register_user_query);
+        try {
+            mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+            $register_user_query = "INSERT INTO business(business_name, business_description, business_email, business_password, area_id) VALUES (?, ?, ?, ?, ?)";
+            $stmt = mysqli_prepare($conn, $register_user_query);
 
-        if ($stmt) {
-            mysqli_stmt_bind_param($stmt, "ssssi", $username, $description, $userEMAIL, $userpassword, $areaId);
-            if (mysqli_stmt_execute($stmt)) {
+            if ($stmt) {
+                mysqli_stmt_bind_param($stmt, "ssssi", $username, $description, $userEMAIL, $userpassword, $areaId);
+                mysqli_stmt_execute($stmt);
+
                 $_SESSION['message'] = 'Business registered successfully';
                 header("Location: /healthy_habitat/login.php");
+                exit();
             } else {
-                $_SESSION['message'] = "Error: " . mysqli_stmt_error($stmt);
+                $_SESSION['message'] = 'Failed to prepare statement.';
             }
-        } else {
-            $_SESSION['message'] = 'Database error, please try again later.';
+        } catch (mysqli_sql_exception $e) {
+            if (str_contains($e->getMessage(), "Duplicate entry")) {
+                $_SESSION['message'] = "Email already registered. Please use a different email.";
+            } else {
+                $_SESSION['message'] = "Registration failed: " . $e->getMessage();
+            }
+            header("Location: " . $_SERVER['PHP_SELF']);
+            exit();
         }
     }
 }
-
 ?>
+
+
+
+
 <div class="d-flex flex-column justify-content-center align-items-center mt-3 gap-3">
     <h1 class="h1">Register your Business</h1>
     <div class="d-flex w-100 gap-5 justify-content-center align-items-center">

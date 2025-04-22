@@ -8,11 +8,11 @@
             <div class="col-md-6 text-md-end">
                 <h5>Team Members</h5>
                 <ul class="list-unstyled">
-                    <li>Ahemad (Requirment Engineer)</li>
                     <li>Anisha Chetiya (Database developer)</li>
-                    <li>Pranay Prasad (Project Lead & Developer)</li>
-                    <li>Sae Kuwabara (Tester)</li>
-                    <li>Tuba Tamanna( UI/UX Desginer)</li>
+                    <li>Pranay Prasad (Full Stack Developer)</li>
+                    <li>Sae Kuwabara (Project Lead & Tester)</li>
+                    <li>Sheheryar Ahmed (Requirment Engineer & Developer)</li>
+                    <li>Tuba Tamanna( UI/UX Desginer & Frontend)</li>
                 </ul>
             </div>
         </div>

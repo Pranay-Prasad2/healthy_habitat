@@ -2,62 +2,65 @@
 include("../navbar.php");
 include("../db.php");
 
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
+
 $product = null;
 $product_id = $_GET['product_id'] ?? $_POST['product_id'] ?? null;
 
-if ($product_id) {
-    $product_id = (int)$product_id; // Ensure it's an integer
-    $query = "SELECT * FROM product WHERE product_id = ?";
-    $stmt = $conn->prepare($query);
-    $stmt->bind_param("i", $product_id);
-    $stmt->execute();
-    $result = $stmt->get_result();
-    
-    if ($result->num_rows === 1) {
-        $product = $result->fetch_assoc();
-    } else {
-        $_SESSION['message'] = "Product not found.";
-    }
-} else {
-    $_SESSION['message'] = "Invalid Product ID.";
-}
+try {
+    if ($product_id) {
+        $product_id = (int)$product_id;
+        $query = "SELECT * FROM product WHERE product_id = ?";
+        $stmt = $conn->prepare($query);
+        $stmt->bind_param("i", $product_id);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-if ($_SERVER["REQUEST_METHOD"] === "POST" && $product_id && isset($_SESSION["b_id"])) {
-    $productname     = filter_input(INPUT_POST, "name", FILTER_SANITIZE_SPECIAL_CHARS);
-    $productdesc     = filter_input(INPUT_POST, "desc", FILTER_SANITIZE_SPECIAL_CHARS);
-    $price           = floatval($_POST["price"]);
-    $productType     = $_POST["type"];
-    $quantity        = intval($_POST["quantity"]);
-    $healthBenefits  = filter_input(INPUT_POST, "health_benefits", FILTER_SANITIZE_SPECIAL_CHARS);
-    $business_id     = intval($_SESSION["b_id"]);
-
-    // Validation
-    if (!$productname || !$productdesc || !$price || !$productType || !$quantity || !$healthBenefits) {
-        $_SESSION['message'] = "All fields are required!";
-    } else {
-        $update_query = "UPDATE product 
-                         SET product_name = ?, product_desc = ?, product_price = ?, business_id = ?, product_type = ?, quantity = ?, health_benefits = ? 
-                         WHERE product_id = ?";
-        $stmt = $conn->prepare($update_query);
-
-        if ($stmt) {
-            $stmt->bind_param("ssdisisi", $productname, $productdesc, $price, $business_id, $productType, $quantity, $healthBenefits, $product_id);
-            if ($stmt->execute()) {
-                $_SESSION['message'] = "Product updated successfully!";
-                header("Location: /healthy_habitat/business/dashboard.php");
-                exit();
-            } else {
-                $_SESSION['message'] = ($conn->errno === 1062)
-                    ? "A product with this name already exists!"
-                    : "Update failed: " . $stmt->error;
-            }
+        if ($result->num_rows === 1) {
+            $product = $result->fetch_assoc();
         } else {
-            $_SESSION['message'] = "Error preparing SQL statement.";
+            $_SESSION['message'] = "Product not found.";
         }
+    } else {
+        $_SESSION['message'] = "Invalid Product ID.";
+    }
+
+    if ($_SERVER["REQUEST_METHOD"] === "POST" && $product_id && isset($_SESSION["b_id"])) {
+        $productname     = filter_input(INPUT_POST, "name", FILTER_SANITIZE_SPECIAL_CHARS);
+        $productdesc     = filter_input(INPUT_POST, "desc", FILTER_SANITIZE_SPECIAL_CHARS);
+        $price           = floatval($_POST["price"]);
+        $productType     = $_POST["type"];
+        $quantity        = intval($_POST["quantity"]);
+        $healthBenefits  = filter_input(INPUT_POST, "health_benefits", FILTER_SANITIZE_SPECIAL_CHARS);
+        $business_id     = intval($_SESSION["b_id"]);
+
+        if (!$productname || !$productdesc || !$price || !$productType || !$quantity || !$healthBenefits) {
+            $_SESSION['message'] = "All fields are required!";
+        } else {
+            $update_query = "UPDATE product 
+                             SET product_name = ?, product_desc = ?, product_price = ?, business_id = ?, product_type = ?, quantity = ?, health_benefits = ? 
+                             WHERE product_id = ?";
+            $stmt = $conn->prepare($update_query);
+            $stmt->bind_param("ssdisisi", $productname, $productdesc, $price, $business_id, $productType, $quantity, $healthBenefits, $product_id);
+            $stmt->execute();
+
+            $_SESSION['message'] = "Product updated successfully!";
+            header("Location: /healthy_habitat/business/dashboard.php");
+            exit();
+        }
+    }
+} catch (mysqli_sql_exception $e) {
+    if (str_contains($e->getMessage(), 'Duplicate entry')) {
+        $_SESSION['message'] = "A product with this name already exists!";
+    } else {
+        $_SESSION['message'] = "Database error: " . $e->getMessage();
+    }
+    if ($_SERVER["REQUEST_METHOD"] === "POST") {
+        header("Location: /healthy_habitat/crud/update-product.php?product_id=" . urlencode($product_id));
+        exit();
     }
 }
 ?>
-
 <!-- Page Content -->
 <div class="container my-5">
     <h2 class="text-center mb-4">Update Product</h2>

@@ -75,22 +75,30 @@ if (!$products) {
                         <p class="card-text"><strong>Business: </strong><?php echo $product_row['business_name']; ?></p>
                         <p class="card-text"><strong>Votes: </strong> <?php echo $product_row['product_likes']; ?></p>
                         <p class="card-text"><strong>Area: </strong> <?php echo $product_row['area_name']; ?></p>
-                        <a href="/healthy_habitat/readmore.php?product_id= <?php echo $product_row['product_id']; ?>" class="btn btn-primary">View Product</a>
+                        <a href="/healthy_habitat/readmore.php?product_id= <?php echo $product_row['product_id']; ?>" class="btn btn-primary">Read more</a>
                     </div>
                 </div>
             <?php } ?>
         </div>
         <div class="text-center mt-4">
-            <a href="/healthy_habitat/product.php" class="btn btn-secondary">See All Products</a>
+            <a href="/healthy_habitat/product.php" class="btn btn-secondary">See all offerings</a>
         </div>
     </div>
 
     <!-- About Us Section -->
-    <div class="about-us-section container mt-5" style="background-color: #f8f9fa; padding: 40px 0;">
-        <h2 class="text-center">About Us</h2>
-        <p class="text-center" style="font-size: 18px; line-height: 1.6; max-width: 800px; margin: 0 auto;">
-            Welcome to our platform, where we offer a wide range of products designed to meet your needs. We are passionate about providing top-quality products at affordable prices, and our mission is to make your shopping experience as smooth and enjoyable as possible. Our team works tirelessly to ensure that we offer the best products that are loved by our customers. Thank you for being part of our journey!
-        </p>
+    <div class="about-us-section container mt-5 p-2" style="background-color: #f8f9fa; padding: 40px 0;">
+        
+        <div class="d-flex justify-content-center align-items-center gap-3">
+            <div>
+                <img class="group" src='./assets/grp.jpeg' alt="team image" style="height: 350px;">
+            </div>
+            <div>
+            <h2 class="text-center">About Us</h2>
+                <p class="text-center" style="font-size: 18px; line-height: 1.6; max-width: 800px; margin: 0 auto;">
+                    Welcome to our platform, where we offer a wide range of products designed to meet your needs. We are passionate about providing top-quality products at affordable prices, and our mission is to make your shopping experience as smooth and enjoyable as possible. Our team works tirelessly to ensure that we offer the best products that are loved by our customers. Thank you for being part of our journey!
+                </p>
+            </div>
+        </div>
     </div>
 </div>
 <script>
@@ -112,6 +120,9 @@ if (!$products) {
 <style>
     .badge {
         transform: rotate(45deg);
+    }
+    .group{
+        border-radius: 25px;
     }
 </style>
 

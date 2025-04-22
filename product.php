@@ -16,6 +16,7 @@ $query = isset($_SESSION['user_id']) ?
         p.product_price, 
         p.product_likes, 
         p.product_type, 
+        p.product_img,
         b.business_name, 
         a.area_name,
         IFNULL(v.user_id, 0) AS liked 
@@ -32,7 +33,8 @@ $query = isset($_SESSION['user_id']) ?
         p.health_benefits, 
         p.product_price, 
         p.product_likes, 
-        p.product_type, 
+        p.product_type,
+        p.product_img, 
         b.business_name, 
         a.area_name
      FROM product p
@@ -42,10 +44,14 @@ $query = isset($_SESSION['user_id']) ?
 $result = mysqli_query($conn, $query);
 $products = [];
 while ($row = mysqli_fetch_assoc($result)) {
+    // echo "Before" . $row['product_img'];
+    // $imageData = $row['product_img'];
+    // $base64Image = base64_encode($imageData);
+    // $row['product_img'] = $base64Image;
+    // echo "after" . $row['product_img'];
     $products[] = $row;
 }
 
-// ✅ Dynamic price range calculation
 $prices = array_column($products, 'product_price');
 $minPrice = min($prices);
 $maxPrice = max($prices);
@@ -62,7 +68,7 @@ $moderateLimit = $minPrice + 2 * ($range / 3);
 <div style="margin:auto; max-width: 1800px;">
     <div class="m-auto d-flex flex-column justify-content-center align-items-center p-5" style="width: 95%;">
         <nav class="card d-flex flex-row justify-content-center align-items-center w-100 gap-3 p-3 position-relative shadow p-4">
-            <input type="text" id="searchBar" class="form-control w-25" placeholder="Search product...">
+            <input type="text" id="searchBar" class="form-control w-25" placeholder="Search Offerings...">
             <ul id="suggestions" class="list-group position-absolute" style="z-index: 999; top: 60px; left: 0; width: 25%; display: none;"></ul>
 
             <select id="typeFilter" class="form-control w-25">
@@ -146,12 +152,13 @@ $moderateLimit = $minPrice + 2 * ($range / 3);
             const liked = product.liked == userId;
             const card = document.createElement("div");
             card.className = "card w-100 position-relative overflow-hidden";
-
+            // const productImgBase64 = product.product_img ? `data:image/jpeg;base64,${product.product_img}` : ''; 
             card.innerHTML = `
               <span class="position-absolute text-capitalize p-2 px-5 fs-6 badge bg-danger" style="top: 22px; right: -40px;">
                  ${product.product_type}
               </span>
-              <img class="card-img-top" src="./assets/products.jpg" alt="Product image">
+
+            <img class="card-img-top" src="./assets/products.jpg" alt="Product image">
               <div class="card-body d-flex flex-column justify-content-between">
                     <div class="product-details mb-3">
                         <h5 class="card-title">${product.product_name}</h5>

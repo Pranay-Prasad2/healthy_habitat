@@ -1,7 +1,7 @@
 <?php
 include("../db.php");
 include("../navbar.php");
-
+mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 if (isset($_SESSION['message'])) {
     echo '
     <div class="toast-container position-fixed bottom-0 end-0 p-3">
@@ -35,25 +35,32 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $userinterest = filter_input(INPUT_POST, "interest", FILTER_SANITIZE_SPECIAL_CHARS);
     $areaId = $_POST["area_id"];
 
-    $register_user_querry = "INSERT INTO users(user_name,user_email,user_password,age,gender,interests,area_id) VALUES (?,?,?,?,?,?,?)";
-    $stmt = mysqli_prepare($conn, $register_user_querry);
+    try {
+        $register_user_querry = "INSERT INTO users(user_name,user_email,user_password,age,gender,interests,area_id) VALUES (?,?,?,?,?,?,?)";
+        $stmt = mysqli_prepare($conn, $register_user_querry);
 
-    if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "sssissi", $username, $userEMAIL, $userpassword,$userage,$usergender,$userinterest, $areaId);
-        if (mysqli_stmt_execute($stmt)) {
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "sssissi", $username, $userEMAIL, $userpassword, $userage, $usergender, $userinterest, $areaId);
+            mysqli_stmt_execute($stmt);
+
             $_SESSION['message'] = 'User registered successfully';
             header("Location: /healthy_habitat/login.php");
             exit();
         } else {
-            $_SESSION['message'] = "Error: " . mysqli_stmt_error($stmt);
-            echo "Error: " . mysqli_stmt_error($stmt);
+            $_SESSION['message'] = 'Failed to prepare the statement.';
         }
-    }else {
-        $_SESSION['message'] = 'Database error, please try again later.';
+    } catch (mysqli_sql_exception $e) {
+        if (str_contains($e->getMessage(), "Duplicate entry")) {
+            $_SESSION['message'] = "Email already registered. Please use a different email.";
+        } else {
+            $_SESSION['message'] = "Registration failed: " . $e->getMessage();
+        }
     }
+
     header("Location: " . $_SERVER['PHP_SELF']);
     exit();
 }
+
 ?>
 
 <div class="d-flex flex-column justify-content-center align-items-center mt-3 gap-3">
@@ -78,7 +85,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             </div>
             <div class="mb-3">
                 <label for="uage" class="form-label">Age</label>
-                <input type="number" class="form-control" name="uage" id="uage" required>
+                <input type="number" class="form-control" name="uage" id="uage" min="1" required>
             </div>
             <div class="mb-3">
                 <label for="gender" class="form-label">Gender</label>

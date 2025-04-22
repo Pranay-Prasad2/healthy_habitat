@@ -11,35 +11,35 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $healthBenefits = filter_input(INPUT_POST, "health_benefits", FILTER_SANITIZE_SPECIAL_CHARS);
     $b_id = $_SESSION["b_id"];
 
-    // Check if all required fields are filled
-    if (empty($productname) || empty($productdesc) || empty($price) ||  empty($productType) || empty($quantity) || empty($healthBenefits)) {
+    if (empty($productname) || empty($productdesc) || empty($price) || empty($productType) || empty($quantity) || empty($healthBenefits)) {
         $_SESSION['message'] = "All fields are required!";
         header("Location: /healthy_habitat/crud/add-products.php");
         exit();
     }
 
-    $insert_query = "INSERT INTO product (product_name, product_desc, product_price, business_id, product_type, quantity, health_benefits) 
-                     VALUES (?, ?, ?, ?, ?, ?, ?)";
-    $stmt = mysqli_prepare($conn, $insert_query);
+    try {
+        mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
-    if ($stmt) {
-        mysqli_stmt_bind_param($stmt, "ssdisis", $productname, $productdesc, $price, $b_id, $productType, $quantity, $healthBenefits);
-        if (mysqli_stmt_execute($stmt)) {
+        $insert_query = "INSERT INTO product (product_name, product_desc, product_price, business_id, product_type, quantity, health_benefits) 
+                         VALUES (?, ?, ?, ?, ?, ?, ?)";
+        $stmt = mysqli_prepare($conn, $insert_query);
+
+        if ($stmt) {
+            mysqli_stmt_bind_param($stmt, "ssdisis", $productname, $productdesc, $price, $b_id, $productType, $quantity, $healthBenefits);
+            mysqli_stmt_execute($stmt);
+
             $_SESSION['message'] = "Product added successfully!";
             header("Location: /healthy_habitat/business/dashboard.php");
             exit();
         } else {
-            // Check for duplicate product name error
-            if (mysqli_errno($conn) == 1062) { // Error code for duplicate entry
-                $_SESSION['message'] = "Error: A product with this name already exists!";
-            } else {
-                $_SESSION['message'] = "Error: " . mysqli_stmt_error($stmt);
-            }
-            header("Location: /healthy_habitat/crud/add-products.php");
-            exit();
+            $_SESSION['message'] = "Error preparing the SQL statement.";
         }
-    } else {
-        $_SESSION['message'] = "Error preparing the SQL statement.";
+    } catch (mysqli_sql_exception $e) {
+        if (str_contains($e->getMessage(), 'Duplicate entry')) {
+            $_SESSION['message'] = "A product with this name already exists!";
+        } else {
+            $_SESSION['message'] = "Error: " . $e->getMessage();
+        }
         header("Location: /healthy_habitat/crud/add-products.php");
         exit();
     }
@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
 <!-- Page Content -->
 <div class="container my-5">
-    <h2 class="text-center mb-4">Add New Product</h2>
+    <h2 class="text-center mb-4">Add New Products/Services</h2>
 
     <!-- Toast Message -->
     <?php if (isset($_SESSION['message'])): ?>
@@ -80,22 +80,22 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             <div class="card shadow p-4">
                 <form action="<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>" method="post">
                     <div class="mb-3">
-                        <label for="name" class="form-label">Product Name</label>
+                        <label for="name" class="form-label">Name</label>
                         <input type="text" class="form-control" id="name" name="name" required>
                     </div>
 
                     <div class="mb-3">
-                        <label for="desc" class="form-label">Product Description</label>
+                        <label for="desc" class="form-label">Description</label>
                         <textarea name="desc" id="desc" class="form-control" rows="3" required></textarea>
                     </div>
 
                     <div class="mb-3">
-                        <label for="price" class="form-label">Product Price</label>
+                        <label for="price" class="form-label">Price</label>
                         <input type="number" class="form-control" id="price" name="price" required step="0.01">
                     </div>
 
                     <div class="mb-3">
-                        <label for="type" class="form-label">Product Type</label>
+                        <label for="type" class="form-label">Type</label>
                         <select name="type" id="type" class="form-control" required onchange="toggleQuantityField()">
                             <option value="">Select Type</option>
                             <option value="product">Product</option>
@@ -116,7 +116,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                     <!-- Hidden field for business_id -->
                     <input type="hidden" name="business_id" value="<?php echo $_SESSION['b_id']; ?>">
 
-                    <button type="submit" class="btn btn-primary w-100">Add Product</button>
+                    <button type="submit" class="btn btn-primary w-100">Add Offering</button>
                 </form>
             </div>
         </div>
